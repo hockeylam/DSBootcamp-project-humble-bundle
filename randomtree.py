@@ -7,6 +7,7 @@ import os
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.ensemble import RandomForestRegressor
 
 # Download the dataset
 path = kagglehub.dataset_download("shrutibhargava94/india-air-quality-data")
@@ -162,50 +163,52 @@ _, _, y_no2_train, y_no2_test = train_test_split(X, y_no2, test_size=0.2, random
 _, _, y_rspm_train, y_rspm_test = train_test_split(X, y_rspm, test_size=0.2, random_state=42)
 
 # 3. Train a simple Linear Regression model
-model_so2 = LinearRegression()
+model_so2 = RandomForestRegressor(n_estimators=30, max_depth=10, random_state=42, n_jobs=-1)
+model_no2 = RandomForestRegressor(n_estimators=30, max_depth=10, random_state=42, n_jobs=-1)
+model_rspm = RandomForestRegressor(n_estimators=30, max_depth=10, random_state=42, n_jobs=-1)
+
 model_so2.fit(X_train, y_so2_train)
+model_no2.fit(X_train, y_no2_train)
+model_rspm.fit(X_train, y_rspm_train)
+
+# 4. Predictions
 y_so2_pred = model_so2.predict(X_test)
+y_no2_pred = model_no2.predict(X_test)
+y_rspm_pred = model_rspm.predict(X_test)
+
+# 5. Evaluate
 print("SO2 Prediction Performance")
 print("MSE:", mean_squared_error(y_so2_test, y_so2_pred))
 print("R2:", r2_score(y_so2_test, y_so2_pred))
 
-
-model_no2 = LinearRegression()
-model_no2.fit(X_train, y_no2_train)
-y_no2_pred = model_no2.predict(X_test)
 print("\nNO2 Prediction Performance")
 print("MSE:", mean_squared_error(y_no2_test, y_no2_pred))
 print("R2:", r2_score(y_no2_test, y_no2_pred))
 
-model_rspm = LinearRegression()
-model_rspm.fit(X_train, y_rspm_train)
-y_rspm_pred = model_rspm.predict(X_test)
 print("\nRSPM Prediction Performance")
 print("MSE:", mean_squared_error(y_rspm_test, y_rspm_pred))
 print("R2:", r2_score(y_rspm_test, y_rspm_pred))
 
+print("=======================================================")
+
+
 #OVERFITTING CHECK
-print("\n--- Overfitting Check (Training Data Performance) ---")
-
-
 # Predictions on Training Set
 y_so2_train_pred = model_so2.predict(X_train)
+y_no2_train_pred = model_no2.predict(X_train)
+y_rspm_train_pred = model_rspm.predict(X_train)
+
+# Evaluate on Training Data
+print("\n--- Overfitting Check (Training Data Performance) ---")
+
 print("SO2 Training Performance")
 print("Train MSE:", mean_squared_error(y_so2_train, y_so2_train_pred))
 print("Train R2:", r2_score(y_so2_train, y_so2_train_pred))
 
-y_no2_train_pred = model_no2.predict(X_train)
 print("\nNO2 Training Performance")
 print("Train MSE:", mean_squared_error(y_no2_train, y_no2_train_pred))
 print("Train R2:", r2_score(y_no2_train, y_no2_train_pred))
 
-y_rspm_train_pred = model_rspm.predict(X_train)
 print("\nRSPM Training Performance")
 print("Train MSE:", mean_squared_error(y_rspm_train, y_rspm_train_pred))
 print("Train R2:", r2_score(y_rspm_train, y_rspm_train_pred))
-
-
-
-
-
-
